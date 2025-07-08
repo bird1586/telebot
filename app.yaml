@@ -1,0 +1,43 @@
+# 指定應用程式的運行時環境為 Python 3.9 (或更高版本，例如 python310, python311)
+runtime: python39
+
+# 應用程式的進入點。
+# 我們使用 gunicorn 作為 WSGI 伺服器來運行 Flask 應用。
+# "-b :$PORT" 告訴 gunicorn 監聽由 App Engine 提供的 PORT 環境變數。
+# "app:app" 指的是 app.py 檔案中的 app 實例 (Flask 應用)。
+entrypoint: gunicorn -b :$PORT app:app
+
+# 應用程式的實例類型。
+# F1 是標準環境中最小的實例，通常包含在免費額度內。
+instance_class: F1
+
+# 自動擴縮配置。
+# min_instances: 0 允許應用程式在閒置時縮減到零個實例，這有助於節省成本，但會導致冷啟動延遲。
+# max_instances: 1 對於大多數小型 Bot 來說足夠了，避免不必要的費用。
+automatic_scaling:
+  min_instances: 0
+  max_instances: 1
+  min_pending_latency: automatic
+  max_pending_latency: automatic
+
+# 環境變數。
+# 這裡儲存你的 Telegram Bot Token。在部署前務必替換 YOUR_TELEGRAM_BOT_TOKEN_HERE。
+# 這樣做比直接寫在程式碼中更安全。
+env_variables:
+  TELEGRAM_BOT_TOKEN: "YOUR_TELEGRAM_BOT_TOKEN_HERE"
+
+# 路由規則。
+# 這些規則告訴 App Engine 如何將收到的請求導向你的應用程式。
+handlers:
+# 這個 handler 處理來自 Telegram 的 Webhook POST 請求。
+# url: /telegram-webhook 必須與 app.py 中的 @app.route('/telegram-webhook') 匹配。
+# secure: always 確保使用 HTTPS，這是 Telegram Webhook 的強制要求。
+- url: /telegram-webhook
+  script: auto
+  secure: always
+
+# 這個 handler 處理所有其他請求 (可選，但建議有預設處理)。
+# 例如，如果你訪問根 URL，它會導向你的應用程式。
+- url: /.*
+  script: auto
+  secure: always
