@@ -18,29 +18,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
-    help_text = """Available Functions:
+    help_text = """🤖 **Available Commands:**
 
-Commands:
-/start - Start the bot and show keyboard buttons
-/help - Show this help message
-/shorten - Shorten a URL (or use the keyboard button)
-/cancel - Cancel any active operation and return to main menu
+/start - Show main menu
+/help - Show this help
+/shorten - Shorten a URL
+/cancel - Cancel current operation
 
-Keyboard Buttons:
-• Shorten URL - Tap this button, then send any URL to get a shortened version
-• Help - Show this help message
-• Cancel - Cancel any active operation and return to main menu
-
-Echo Function:
-Just send me any text message and I'll echo it back to you!
-
-How to use URL Shortener:
-1. Tap the "Shorten URL" button or use /shorten command
-2. Send any valid URL (like https://example.com)
-3. Get back a shortened URL using TinyURL service
-4. Use "Cancel" button or /cancel command to exit URL shortening mode"""
+💡 **Tip:** Use the keyboard buttons for easier access!"""
     
-    await update.message.reply_text(help_text)
+    await update.message.reply_text(help_text, parse_mode='Markdown')
 
 async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /cancel command to exit any waiting mode."""
