@@ -23,6 +23,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} "
             cd /home/bird1586/my-python-app &&
             git pull &&
-            /home/bird1586/my-python-app/venv/bin/pip install -r requirements.txt &&
+            /home/bird1586/venv/bin/pip install -r requirements.txt &&
             sudo systemctl restart my-python-app
           "
