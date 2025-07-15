@@ -2,8 +2,8 @@ import os
 import logging
 import pyshorteners
 import re
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
+from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
 # Enable logging
 logging.basicConfig(
@@ -25,62 +25,40 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     
-    # Create inline keyboard with function buttons
+    # Create reply keyboard with function buttons
     keyboard = [
-        [
-            InlineKeyboardButton("Shorten URL", callback_data='shorten'),
-            InlineKeyboardButton("Help", callback_data='help')
-        ]
+        [KeyboardButton("Shorten URL"), KeyboardButton("Help")]
     ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
     
     await update.message.reply_text(
-        f'Hi {user.first_name}! I\'m a multi-function bot. Choose an option below or send me any message and I\'ll echo it back!',
+        f'Hi {user.first_name}! Welcome to the multi-function bot! Use the buttons below to access different features.',
         reply_markup=reply_markup
     )
 
-async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle button presses."""
-    query = update.callback_query
-    await query.answer()
-    
-    user_id = query.from_user.id
-    
-    if query.data == 'shorten':
-        user_states[user_id] = 'waiting_for_url'
-        await query.edit_message_text(
-            text="Please send me a URL to shorten (e.g., https://example.com)"
-        )
-    elif query.data == 'help':
-        await show_help(query)
 
-async def show_help(query_or_update):
+async def show_help(update):
     """Show help message."""
     help_text = """Available Functions:
 
 Commands:
-/start - Start the bot and show function buttons
+/start - Start the bot and show keyboard buttons
 /help - Show this help message
-/shorten - Shorten a URL (or use the button)
+/shorten - Shorten a URL (or use the keyboard button)
 
-Button Functions:
-• Shorten URL - Click this button, then send any URL to get a shortened version
+Keyboard Buttons:
+• Shorten URL - Tap this button, then send any URL to get a shortened version
 • Help - Show this help message
 
 Echo Function:
 Just send me any text message and I'll echo it back to you!
 
 How to use URL Shortener:
-1. Click the "Shorten URL" button or use /shorten command
+1. Tap the "Shorten URL" button or use /shorten command
 2. Send any valid URL (like https://example.com)
 3. Get back a shortened URL using TinyURL service"""
     
-    if hasattr(query_or_update, 'edit_message_text'):
-        # It's a callback query
-        await query_or_update.edit_message_text(text=help_text)
-    else:
-        # It's a regular message
-        await query_or_update.message.reply_text(help_text)
+    await update.message.reply_text(help_text)
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
@@ -108,6 +86,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     user_id = update.effective_user.id
     user_message = update.message.text
     
+    # Handle keyboard button presses
+    if user_message == "Shorten URL":
+        user_states[user_id] = 'waiting_for_url'
+        await update.message.reply_text("Please send me a URL to shorten (e.g., https://example.com)")
+        return
+    elif user_message == "Help":
+        await show_help(update)
+        return
+    
     # Check if user is in URL shortening mode
     if user_id in user_states and user_states[user_id] == 'waiting_for_url':
         if is_valid_url(user_message):
@@ -117,12 +104,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 
                 # Create keyboard to go back to main menu
                 keyboard = [
-                    [
-                        InlineKeyboardButton("Shorten Another URL", callback_data='shorten'),
-                        InlineKeyboardButton("Help", callback_data='help')
-                    ]
+                    [KeyboardButton("Shorten URL"), KeyboardButton("Help")]
                 ]
-                reply_markup = InlineKeyboardMarkup(keyboard)
+                reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
                 
                 await update.message.reply_text(
                     f"Original URL: {user_message}\nShortened URL: {shortened_url}",
@@ -154,9 +138,6 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("shorten", shorten_command))
-    
-    # Register callback query handler for buttons
-    application.add_handler(CallbackQueryHandler(button_handler))
     
     # Register message handler for text messages
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
