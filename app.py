@@ -7,6 +7,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from config import BOT_TOKEN, LOGGING_FORMAT, LOGGING_LEVEL
 from handlers.basic_handlers import start, help_command, cancel_command
 from handlers.url_shortener import shorten_command
+from handlers.web_monitor import webmonitor_command
 from handlers.message_handler import handle_message
 
 # Enable logging
@@ -22,6 +23,7 @@ def setup_handlers(application: Application) -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("shorten", shorten_command))
+    application.add_handler(CommandHandler("webmonitor", webmonitor_command))
     application.add_handler(CommandHandler("cancel", cancel_command))
     
     # Message handler for text messages

@@ -8,7 +8,7 @@ def get_main_keyboard() -> ReplyKeyboardMarkup:
     """Get the main menu keyboard."""
     keyboard = [
         [KeyboardButton("Shorten URL"), KeyboardButton("Help")],
-        [KeyboardButton("Cancel")]
+        [KeyboardButton("WebMonitor"), KeyboardButton("Cancel")]
     ]
     return ReplyKeyboardMarkup(
         keyboard, 
