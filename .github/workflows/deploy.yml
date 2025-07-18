@@ -22,10 +22,27 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: |
+          
           ssh -o StrictHostKeyChecking=no ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} "
-            echo "TELEGRAM_TOKEN=${TELEGRAM_TOKEN}" > /home/bird1586/my-python-app/.env
-            cd /home/bird1586/my-python-app &&
+            echo "TELEGRAM_TOKEN=${TELEGRAM_TOKEN}" > ${{ secrets.PROJECT_PATH }}/.env
+            sudo cat <<EOF > /etc/systemd/system/telebot.service
+              [Unit]
+              Description=telebot backend
+              After=network.target
+          
+              [Service]
+              Type=simple
+              User=${{ secrets.GCP_VM_USER }}
+              ExecStart=${{ secrets.PROJECT_PATH }}/venv/bin/python ${{ secrets.PROJECT_PATH }}/app.py
+              Restart=on-failure
+          
+              [Install]
+              WantedBy=multi-user.target
+              EOF
+            cd ${{ secrets.PROJECT_PATH }} &&
             git pull &&
-            /home/bird1586/venv/bin/pip install -r requirements.txt &&
-            sudo systemctl restart my-python-app
+            ${{ secrets.PROJECT_PATH }}/venv/bin/pip install -r requirements.txt &&
+            sudo systemctl daemon-reload
+            sudo systemctl enable telebot.service
+            sudo systemctl restart telebot.service
           "
