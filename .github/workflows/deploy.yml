@@ -41,7 +41,7 @@ jobs:
         run: |
           
           ssh -o StrictHostKeyChecking=no ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} "
-            echo "TELEGRAM_TOKEN=${TELEGRAM_TOKEN}" > ${{ secrets.PROJECT_PATH }}/.env
+            echo "${TELEGRAM_TOKEN}" > ${{ secrets.PROJECT_PATH }}/.env
             sudo mv /tmp/telebot.service /etc/systemd/system/telebot.service
             cd ${{ secrets.PROJECT_PATH }} &&
             git pull &&
