@@ -6,11 +6,12 @@ from telegram.ext import ContextTypes
 from utils.keyboards import get_main_keyboard
 
 # Monitor URL
-MONITOR_URL = "https://retail-madelaine-cwb6578-e1285172.koyeb.app/"
+MONITOR_URL = "http://34.168.151.117:10800/"
 
 async def webmonitor_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /webmonitor command."""
     reply_markup = get_main_keyboard()
+    # chat_id = update.effective_chat.id
     await update.message.reply_text(
         f"🌐 **Web Monitor**\n\nMonitoring URL: {MONITOR_URL}\n\n🔗 Click the link to access the monitoring dashboard.",
         reply_markup=reply_markup,
