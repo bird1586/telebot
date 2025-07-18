@@ -25,6 +25,7 @@ jobs:
           After=network.target
           
           [Service]
+          WorkingDirectory=${{ secrets.PROJECT_PATH }}
           Type=simple
           User=${{ secrets.GCP_VM_USER }}
           ExecStart=${{ secrets.PROJECT_PATH }}/venv/bin/python ${{ secrets.PROJECT_PATH }}/app.py
