@@ -18,6 +18,23 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
 
+      - name: Upload service file
+        run: |
+          echo "[Unit]
+          Description=telebot backend
+          After=network.target
+          
+          [Service]
+          Type=simple
+          User=${{ secrets.GCP_VM_USER }}
+          ExecStart=${{ secrets.PROJECT_PATH }}/venv/bin/python ${{ secrets.PROJECT_PATH }}/app.py
+          Restart=on-failure
+          
+          [Install]
+          WantedBy=multi-user.target" > telebot.service
+
+          scp -o StrictHostKeyChecking=no telebot.service ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }}:/tmp/telebot.service
+
       - name: Deploy to GCP VM
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -25,21 +42,7 @@ jobs:
           
           ssh -o StrictHostKeyChecking=no ${{ secrets.GCP_VM_USER }}@${{ secrets.GCP_VM_IP }} "
             echo "TELEGRAM_TOKEN=${TELEGRAM_TOKEN}" > ${{ secrets.PROJECT_PATH }}/.env
-            sudo cat <<EOF > telebot.service
-              [Unit]
-              Description=telebot backend
-              After=network.target
-          
-              [Service]
-              Type=simple
-              User=${{ secrets.GCP_VM_USER }}
-              ExecStart=${{ secrets.PROJECT_PATH }}/venv/bin/python ${{ secrets.PROJECT_PATH }}/app.py
-              Restart=on-failure
-          
-              [Install]
-              WantedBy=multi-user.target
-              EOF
-            sudo mv telebot.service /etc/systemd/system/telebot.service
+            sudo mv /tmp/telebot.service /etc/systemd/system/telebot.service
             cd ${{ secrets.PROJECT_PATH }} &&
             git pull &&
             ${{ secrets.PROJECT_PATH }}/venv/bin/pip install -r requirements.txt &&
