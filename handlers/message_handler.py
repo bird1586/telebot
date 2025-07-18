@@ -7,6 +7,7 @@ from utils.state_manager import state_manager
 from handlers.basic_handlers import help_command, cancel_command
 from handlers.url_shortener import shorten_command, handle_url_shortening, WAITING_FOR_URL
 from handlers.web_monitor import handle_monit_message
+from handlers.panel import panel_command
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle text messages."""
@@ -25,6 +26,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
     elif user_message.lower() == "monit":
         await handle_monit_message(update)
+        return
+    elif user_message == "Panel":
+        await panel_command(update, context)
         return
     elif user_message == "Cancel":
         await cancel_command(update, context)
