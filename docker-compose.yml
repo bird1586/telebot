@@ -1,0 +1,10 @@
+services:
+  telebot:
+    build: .
+    env_file:
+      - .env
+    container_name: telebot
+
+    volumes:
+      - ./:/app                      # 開發時可熱重載（非必要）
+    command: python app.py      # 運行主程式（依你的檔案名稱調整）
