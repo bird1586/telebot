@@ -60,8 +60,6 @@ async def toggle_app_status(app_name: str) -> dict:
     except Exception as e:
         logger.error(f"Error toggling app {app_name}: {e}")
         return {'success': False, 'error': str(e)}
-    finally:
-        os.chdir(cwd)
 
 
 async def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
