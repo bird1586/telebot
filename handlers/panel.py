@@ -63,7 +63,7 @@ async def toggle_app_status(app_name: str) -> dict:
 
 async def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show all apps with their current status."""
-    current_apps = get_app_status()
+    current_apps = await get_app_status()
     
     if not current_apps:
         keyboard = [[InlineKeyboardButton("🔙 Back", callback_data="back_to_panel")]]
@@ -154,9 +154,8 @@ async def handle_panel_callback(update: Update, context: ContextTypes.DEFAULT_TY
         # Extract app name and toggle its status
         try:
             app_name = callback_data.replace("toggle_", "")
-            toggle_app_status(app_name)
-            asyncio.sleep(5)
-            show_app_status(update, context)
+            await toggle_app_status(app_name)
+            await show_app_status(update, context)
                 
         except:
             # Show error message
