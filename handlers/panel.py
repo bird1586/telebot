@@ -61,7 +61,7 @@ async def toggle_app_status(app_name: str) -> dict:
         return {'success': False, 'error': str(e)}
 
 
-async def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show all apps with their current status."""
     current_apps = get_app_status()
     
@@ -124,7 +124,7 @@ async def handle_panel_callback(update: Update, context: ContextTypes.DEFAULT_TY
     callback_data = query.data
     
     if callback_data == "app_status":
-        await show_app_status(update, context)
+        show_app_status(update, context)
         
         
     elif callback_data == "close_panel":
@@ -166,7 +166,7 @@ async def handle_panel_callback(update: Update, context: ContextTypes.DEFAULT_TY
                 parse_mode='Markdown'
             )
             # Still refresh the status to show current state
-            await show_app_status(update, context)
+            show_app_status(update, context)
 
 
 # Additional utility functions for advanced features
