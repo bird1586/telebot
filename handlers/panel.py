@@ -19,7 +19,7 @@ async def get_app_status():
     """Scan for Docker Compose projects and get their status."""
     
     try:
-        apps = requests.get(r'http://localhost:5000/apps').json()
+        apps = requests.get(r'http://172.17.0.1:5000/apps').json()
         return apps
         
     except Exception as e:
@@ -54,7 +54,7 @@ async def toggle_app_status(app_name: str) -> dict:
     """
    
     try:
-        requests.post(rf'http://localhost:5000/toggle/{app_name}')
+        requests.post(rf'http://172.17.0.1:5000/toggle/{app_name}')
         return {'success': False, 'error': f'App {app_name} not found'}
         
     except Exception as e:
