@@ -70,7 +70,7 @@ def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         reply_markup = InlineKeyboardMarkup(keyboard)
         
         query = update.callback_query
-        await query.edit_message_text(
+        query.edit_message_text(
             "📭 **No Docker Compose Applications Found**\n\n"
             "No `docker-compose.yml` files found in subdirectories.\n"
             "Make sure your applications are in separate folders with their own docker-compose.yml files.",
