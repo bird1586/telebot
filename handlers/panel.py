@@ -11,7 +11,7 @@ import os
 import requests
 import subprocess
 import json
-import time
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +61,7 @@ async def toggle_app_status(app_name: str) -> dict:
         return {'success': False, 'error': str(e)}
 
 
-def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show all apps with their current status."""
     current_apps = get_app_status()
     
@@ -70,7 +70,7 @@ def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         reply_markup = InlineKeyboardMarkup(keyboard)
         
         query = update.callback_query
-        query.edit_message_text(
+        await query.edit_message_text(
             "📭 **No Docker Compose Applications Found**\n\n"
             "No `docker-compose.yml` files found in subdirectories.\n"
             "Make sure your applications are in separate folders with their own docker-compose.yml files.",
@@ -109,7 +109,7 @@ def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     status_summary += "**Click on any app to start/stop it**"
     
     query = update.callback_query
-    query.edit_message_text(
+    await query.edit_message_text(
         status_summary,
         reply_markup=reply_markup,
         parse_mode='Markdown'
@@ -124,7 +124,7 @@ async def handle_panel_callback(update: Update, context: ContextTypes.DEFAULT_TY
     callback_data = query.data
     
     if callback_data == "app_status":
-        show_app_status(update, context)
+        await show_app_status(update, context)
         
         
     elif callback_data == "close_panel":
@@ -155,7 +155,7 @@ async def handle_panel_callback(update: Update, context: ContextTypes.DEFAULT_TY
         try:
             app_name = callback_data.replace("toggle_", "")
             toggle_app_status(app_name)
-            time.sleep(5)
+            asyncio.sleep(5)
             show_app_status(update, context)
                 
         except:
@@ -166,7 +166,7 @@ async def handle_panel_callback(update: Update, context: ContextTypes.DEFAULT_TY
                 parse_mode='Markdown'
             )
             # Still refresh the status to show current state
-            show_app_status(update, context)
+            await show_app_status(update, context)
 
 
 # Additional utility functions for advanced features
