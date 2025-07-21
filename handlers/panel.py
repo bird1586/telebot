@@ -11,6 +11,7 @@ import os
 import requests
 import subprocess
 import json
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +106,7 @@ async def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     ])
     
     reply_markup = InlineKeyboardMarkup(keyboard)
-    status_summary += "\n?’¡ **Click on any app to start/stop it**\n??"
+    status_summary += "**Click on any app to start/stop it**"
     
     query = update.callback_query
     await query.edit_message_text(
@@ -154,13 +155,14 @@ async def handle_panel_callback(update: Update, context: ContextTypes.DEFAULT_TY
         try:
             app_name = callback_data.replace("toggle_", "")
             toggle_app_status(app_name)
+            time.sleep(5)
             await show_app_status(update, context)
                 
         except:
             # Show error message
             await context.bot.send_message(
                 chat_id=query.message.chat_id,
-                text=f"??**Error toggling {app_name}**"
+                text=f"**Error toggling {app_name}**",
                 parse_mode='Markdown'
             )
             # Still refresh the status to show current state
