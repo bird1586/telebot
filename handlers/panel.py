@@ -109,7 +109,7 @@ def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     status_summary += "**Click on any app to start/stop it**"
     
     query = update.callback_query
-    await query.edit_message_text(
+    query.edit_message_text(
         status_summary,
         reply_markup=reply_markup,
         parse_mode='Markdown'
