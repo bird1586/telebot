@@ -31,7 +31,6 @@ async def panel_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     """Handle /panel command - show main panel."""
     keyboard = [
         [InlineKeyboardButton("📊 App Status", callback_data="app_status")],
-        [InlineKeyboardButton("🔄 Refresh", callback_data="refresh_apps")],
         [InlineKeyboardButton("❌ Close", callback_data="close_panel")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -40,7 +39,6 @@ async def panel_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         "🎛️ **Docker Control Panel**\n\n"
         "Manage your Docker Compose applications:\n\n"
         "📊 **App Status** - View and control running apps\n"
-        "🔄 **Refresh** - Scan for new applications\n"
         "❌ **Close** - Exit the panel",
         reply_markup=reply_markup,
         parse_mode='Markdown'
@@ -103,12 +101,11 @@ async def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     
     # Add control buttons
     keyboard.append([
-        InlineKeyboardButton("🔄 Refresh", callback_data="refresh_apps"),
         InlineKeyboardButton("🔙 Back", callback_data="back_to_panel")
     ])
     
     reply_markup = InlineKeyboardMarkup(keyboard)
-    status_summary += "\n💡 **Click on any app to start/stop it**\n🔄 **Refresh** to update status"
+    status_summary += "\n?�� **Click on any app to start/stop it**\n??"
     
     query = update.callback_query
     await query.edit_message_text(
@@ -128,10 +125,6 @@ async def handle_panel_callback(update: Update, context: ContextTypes.DEFAULT_TY
     if callback_data == "app_status":
         await show_app_status(update, context)
         
-    elif callback_data == "refresh_apps":
-        # Refresh app list and show status
-        await query.answer("🔄 Refreshing applications...")
-        await show_app_status(update, context)
         
     elif callback_data == "close_panel":
         await query.edit_message_text(
@@ -143,7 +136,6 @@ async def handle_panel_callback(update: Update, context: ContextTypes.DEFAULT_TY
         # Show main panel again
         keyboard = [
             [InlineKeyboardButton("📊 App Status", callback_data="app_status")],
-            [InlineKeyboardButton("🔄 Refresh", callback_data="refresh_apps")],
             [InlineKeyboardButton("❌ Close", callback_data="close_panel")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -152,7 +144,6 @@ async def handle_panel_callback(update: Update, context: ContextTypes.DEFAULT_TY
             "🎛️ **Docker Control Panel**\n\n"
             "Manage your Docker Compose applications:\n\n"
             "📊 **App Status** - View and control running apps\n"
-            "🔄 **Refresh** - Scan for new applications\n"
             "❌ **Close** - Exit the panel",
             reply_markup=reply_markup,
             parse_mode='Markdown'
@@ -160,29 +151,16 @@ async def handle_panel_callback(update: Update, context: ContextTypes.DEFAULT_TY
         
     elif callback_data.startswith("toggle_"):
         # Extract app name and toggle its status
-        app_name = callback_data.replace("toggle_", "")
-        
-        # Show loading message
-        await query.answer(f"🔄 Toggling {app_name}...")
-        
-        # Toggle the app status
-        result = await toggle_app_status(app_name)
-        
-        if result['success']:
-            # Show updated status
+        try:
+            app_name = callback_data.replace("toggle_", "")
+            toggle_app_status(app_name)
             await show_app_status(update, context)
-            
-            # Send notification about the status change
-            action_emoji = "✅" if result['new_status'] else "⏹️"
-            await context.bot.send_message(
-                chat_id=query.message.chat_id,
-                text=f"{action_emoji} **{app_name.replace('_', ' ').title()}** has been {result['action']}!"
-            )
-        else:
+                
+        except:
             # Show error message
             await context.bot.send_message(
                 chat_id=query.message.chat_id,
-                text=f"❌ **Error toggling {app_name}:**\n```\n{result.get('error', 'Unknown error')}\n```",
+                text=f"??**Error toggling {app_name}**"
                 parse_mode='Markdown'
             )
             # Still refresh the status to show current state
