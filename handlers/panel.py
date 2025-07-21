@@ -8,90 +8,22 @@ from utils.keyboards import get_main_keyboard
 from glob import glob
 from pathlib import Path
 import os
+import requests
 import subprocess
 import json
 
 logger = logging.getLogger(__name__)
 
-# Global apps list
-apps = []
-
-
-def get_compose_ps_info(compose_dir='.'):
-    """Get Docker Compose container status information."""
-    cmd = ['sudo', 'docker', 'compose', 'ps', '--format', 'json']
-    try:
-        result = subprocess.run(
-            cmd,
-            cwd=compose_dir,
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        output = result.stdout.strip()
-        if not output:
-            return []
-        
-        # Parse JSON output - each line is a separate JSON object
-        containers = []
-        for line in output.split('\n'):
-            if line.strip():
-                try:
-                    container_info = json.loads(line)
-                    containers.append(container_info)
-                except json.JSONDecodeError:
-                    continue
-        return containers
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Docker compose ps failed: {e}")
-        return []
-    except Exception as e:
-        logger.error(f"Error getting compose info: {e}")
-        return []
-
 
 async def get_app_status():
     """Scan for Docker Compose projects and get their status."""
-    global apps
-    apps = []  # Reset apps list
-    cwd = os.getcwd()
     
     try:
-        # Find all docker-compose.yml files in subdirectories
-        files = glob('*/docker-compose.yml')
-        
-        for file in files:
-            path = Path(file)
-            project_path = os.path.join(cwd, path.parent)
-            
-            # Change to project directory to run docker compose commands
-            os.chdir(project_path)
-            
-            # Get container status
-            containers = get_compose_ps_info()
-            
-            # Check if any containers are running
-            running_containers = [c for c in containers if c.get('State') == 'running']
-            
-            app_info = {
-                'name': path.parent.name,
-                'status': len(running_containers) > 0,
-                'folder': project_path,
-                'containers': containers,
-                'running_count': len(running_containers),
-                'total_count': len(containers)
-            }
-            
-            apps.append(app_info)
-            logger.info(f"Found app: {app_info['name']} - Status: {'Running' if app_info['status'] else 'Stopped'}")
-        
-        # Return to original directory
-        os.chdir(cwd)
+        apps = requests.get(r'http://localhost:5000/apps').json()
         return apps
         
     except Exception as e:
         logger.error(f"Error scanning for apps: {e}")
-        os.chdir(cwd)  # Ensure we return to original directory
         return []
 
 
@@ -120,43 +52,9 @@ async def toggle_app_status(app_name: str) -> dict:
     Toggle the status of a Docker Compose app.
     Returns dict with success status and new app status.
     """
-    cwd = os.getcwd()
-    
+   
     try:
-        for app in apps:
-            if app['name'] == app_name:
-                os.chdir(app['folder'])
-                
-                if app['status']:  # Currently running - stop it
-                    logger.info(f"Stopping app: {app_name}")
-                    result = subprocess.run(
-                        ['sudo', 'docker', 'compose', 'down'],
-                        capture_output=True,
-                        text=True
-                    )
-                    if result.returncode == 0:
-                        app['status'] = False
-                        logger.info(f"Successfully stopped {app_name}")
-                        return {'success': True, 'new_status': False, 'action': 'stopped'}
-                    else:
-                        logger.error(f"Failed to stop {app_name}: {result.stderr}")
-                        return {'success': False, 'error': result.stderr}
-                        
-                else:  # Currently stopped - start it
-                    logger.info(f"Starting app: {app_name}")
-                    result = subprocess.run(
-                        ['sudo', 'docker', 'compose', 'up', '-d'],
-                        capture_output=True,
-                        text=True
-                    )
-                    if result.returncode == 0:
-                        app['status'] = True
-                        logger.info(f"Successfully started {app_name}")
-                        return {'success': True, 'new_status': True, 'action': 'started'}
-                    else:
-                        logger.error(f"Failed to start {app_name}: {result.stderr}")
-                        return {'success': False, 'error': result.stderr}
-        
+        requests.post(rf'http://localhost:5000/toggle/{app_name}')
         return {'success': False, 'error': f'App {app_name} not found'}
         
     except Exception as e:
