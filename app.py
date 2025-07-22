@@ -49,9 +49,9 @@ def main() -> None:
     use_webhook = os.getenv('USE_WEBHOOK', 'false').lower() == 'true'
     
     if use_webhook:
-        tunnels = requests.get('http://172.17.0.1:4040/api/tunnels').json()
+        res = requests.get('http://172.17.0.1:4040/api/tunnels').json()
         telebot_url = ""
-        for tunnel in tunnels:
+        for tunnel in res["tunnels"]:
             if tunnel['name'] == 'telebot':
                 telebot_url = tunnel['public_url']
         os.system(f"python webhook_manager.py set {telebot_url}")
