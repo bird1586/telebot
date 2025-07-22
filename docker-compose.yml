@@ -4,7 +4,8 @@ services:
     env_file:
       - .env
     container_name: telebot
-
+    ports:
+      - "${PORT:-8443}:${PORT:-8443}"  # Expose webhook port
     volumes:
       - ./:/app                      # 開發時可熱重載（非必要）
     command: python app.py      # 運行主程式（依你的檔案名稱調整）
