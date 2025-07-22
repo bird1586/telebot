@@ -9,21 +9,13 @@ from handlers.url_shortener import shorten_command, handle_url_shortening, WAITI
 from handlers.web_monitor import handle_monit_message
 from handlers.panel import panel_command
 import os
-import logging
-
-logging.basicConfig(
-    format=LOGGING_FORMAT,
-    level=getattr(logging, LOGGING_LEVEL)
-)
-logger = logging.getLogger(__name__)
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle text messages."""
     user_id = update.effective_user.id
     user_message = update.message.text
     approve_ID = os.environ.get('APPROVE_ID', '').split(',')
-    logger.info(f"{approve_ID=},   {user_id=}")
-    if user_id in approve_ID:
+    if str(user_id) in approve_ID:
         
         # Handle keyboard button presses
         if user_message == "Shorten URL":
