@@ -81,14 +81,17 @@ async def show_app_status(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     
     keyboard = []
     status_summary = "📊 **Docker Applications Status**\n\n"
-    
+    current_apps = sorted(current_apps, key=lambda x: x['status'])
     for app_info in current_apps:
+        if app_info['name'] in ("telebot", "ngrok"):
+            continue
+        
         status_text = "ON" if app_info['status'] else "OFF"
         status_emoji = "🟢" if app_info['status'] else "🔴"
         
         # Create button text with container count info
         if app_info['total_count'] > 0:
-            button_text = f"{app_info['name']} ({app_info['running_count']}/{app_info['total_count']}) {status_emoji}"
+            button_text = f"{app_info['name']}  {status_emoji}"
         else:
             button_text = f"{app_info['name']} (No containers) ⚪"
         

@@ -6,7 +6,7 @@ from telegram.ext import ContextTypes
 from utils.keyboards import get_main_keyboard
 
 # Monitor URL
-MONITOR_URL = "http://34.168.151.117:10800/"
+MONITOR_URL = "https://9bb6cac636e6.ngrok-free.app/"
 
 async def webmonitor_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /webmonitor command."""
