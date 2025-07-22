@@ -8,11 +8,11 @@ import requests
 
 # Monitor URL
 def get_url():
-    tunnels = requests.get('http://172.17.0.1:4040/api/tunnels').json()
+    res = requests.get('http://172.17.0.1:4040/api/tunnels').json()
     telebot_url = "Not found"
-    for tunnel in tunnels:
-        if tunnel['name'] == 'changeDetection':
-            telebot_url = tunnel['public_url']
+for tunnel in res['tunnels']:
+    if tunnel['name'] == 'changeDetection':
+        telebot_url = tunnel['public_url']
     return telebot_url
 
 
