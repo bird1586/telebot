@@ -27,5 +27,7 @@ jobs:
             git pull &&
             echo "TELEGRAM_TOKEN=${TELEGRAM_TOKEN}" > ${{ secrets.PROJECT_PATH }}/.env  &&
             echo "APPROVE_ID=${{ secrets.APPROVE_ID }}" >> ${{ secrets.PROJECT_PATH }}/.env  &&
+            echo "USE_WEBHOOK=true" >> ${{ secrets.PROJECT_PATH }}/.env  &&
+            echo "PORT=10801" >> ${{ secrets.PROJECT_PATH }}/.env  &&
             sudo docker compose up -d --force-recreate
           "
