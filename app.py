@@ -54,7 +54,7 @@ def main() -> None:
         for tunnel in res["tunnels"]:
             if tunnel['name'] == 'telebot':
                 webhook_url = tunnel['public_url']
-        os.system(f"python webhook_manager.py set {telebot_url}")
+        os.system(f"python webhook_manager.py set {webhook_url}")
         logger.info(f"Starting bot with webhook on port {port}...")
         # Run with webhook
         application.run_webhook(
