@@ -44,6 +44,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             await handle_url_shortening(update, user_id, user_message)
         else:
         # Echo the message as default behavior
-        await update.message.reply_text(user_message)
+            await update.message.reply_text(user_message)
     else:
         await update.message.reply_text(user_message)
