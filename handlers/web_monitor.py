@@ -10,9 +10,9 @@ import requests
 def get_url():
     res = requests.get('http://172.17.0.1:4040/api/tunnels').json()
     telebot_url = "Not found"
-for tunnel in res['tunnels']:
-    if tunnel['name'] == 'changeDetection':
-        telebot_url = tunnel['public_url']
+    for tunnel in res['tunnels']:
+        if tunnel['name'] == 'changeDetection':
+            telebot_url = tunnel['public_url']
     return telebot_url
 
 
