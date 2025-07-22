@@ -15,12 +15,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     reply_markup = get_main_keyboard()
     
     welcome_message = (
-        f"👋 Hello {user.first_name}!\n\n"
-        "Welcome to the Multi-Purpose Bot! 🤖\n\n"
+        f"Hello {user.first_name}!\n\n"
+        "Welcome to the Multi-Purpose Bot!\n\n"
         "I can help you with:\n"
-        "🔗 URL shortening\n"
-        "🌐 Web monitoring\n"
-        "❓ General assistance\n\n"
+        "- URL shortening\n"
+        "- Web monitoring\n"
+        "- Admin panel access\n\n"
         "Use the buttons below or type commands to get started!"
     )
     
@@ -34,25 +34,23 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     reply_markup = get_main_keyboard()
     
     help_message = (
-        "🤖 **Bot Help**\n\n"
-        "**Available Commands:**\n"
-        "• /start - Start the bot and show main menu\n"
-        "• /help - Show this help message\n"
-        "• /shorten - Shorten a URL\n"
-        "• /webmonitor - Access web monitoring dashboard\n"
-        "• /cancel - Cancel current operation\n\n"
-        "**Quick Actions:**\n"
-        "• Use the keyboard buttons for easy navigation\n"
-        "• Type 'monit' for quick web monitor access\n\n"
-        "**Tips:**\n"
-        "• You can always use the Cancel button to exit any operation\n"
-        "• The bot will guide you through each process step by step"
+        "Bot Help\n\n"
+        "Available Commands:\n"
+        "• /start - Show main menu\n"
+        "• /help - Show this help\n"
+        "• /shorten - Shorten URLs\n"
+        "• /webmonitor - Web monitoring\n"
+        "• /panel - Admin control panel\n"
+        "• /cancel - Cancel operation\n\n"
+        "Quick Tips:\n"
+        "• Use keyboard buttons for navigation\n"
+        "• Type 'monit' for quick monitoring\n"
+        "• Cancel button exits any operation"
     )
     
     await update.message.reply_text(
         help_message,
-        reply_markup=reply_markup,
-        parse_mode='Markdown'
+        reply_markup=reply_markup
     )
 
 async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -63,9 +61,9 @@ async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     # Clear any active user state
     if state_manager.has_state(user_id):
         state_manager.clear_state(user_id)
-        message = "✅ Operation cancelled. You're back to the main menu."
+        message = "Operation cancelled. You're back to the main menu."
     else:
-        message = "ℹ️ No active operation to cancel. You're already at the main menu."
+        message = "No active operation to cancel. You're already at the main menu."
     
     await update.message.reply_text(
         message,
