@@ -3,6 +3,7 @@ Main bot application entry point.
 """
 import logging
 import os
+import requests
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters
 from config import BOT_TOKEN, LOGGING_FORMAT, LOGGING_LEVEL
@@ -44,11 +45,16 @@ def main() -> None:
     setup_handlers(application)
     
     # Check if we should use webhook or polling
-    webhook_url = os.getenv('WEBHOOK_URL')
     port = int(os.getenv('PORT', 8443))
     use_webhook = os.getenv('USE_WEBHOOK', 'false').lower() == 'true'
     
-    if use_webhook and webhook_url:
+    if use_webhook:
+        tunnels = requests.get('http://172.17.0.1:4040/api/tunnels').json()
+        telebot_url = ""
+        for tunnel in tunnels:
+            if tunnel['name'] == 'telebot':
+                telebot_url = tunnel['public_url']
+        os.system(f"python webhook_manager.py set {telebot_url}")
         logger.info(f"Starting bot with webhook on port {port}...")
         # Run with webhook
         application.run_webhook(
